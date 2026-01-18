@@ -158,6 +158,7 @@ function TravelGuide() {
   const [showActivitySummary, setShowActivitySummary] = useState(false);
   const [activeTab, setActiveTab] = useState('route'); // 'route', 'activity-0', 'activity-1', etc., 'accommodation', 'fishing-prep', 'fishing-time'
   const [activeLeftTab, setActiveLeftTab] = useState('route-map'); // 'route-map', 'essentials', 'budget'
+  const [showRightPanel, setShowRightPanel] = useState(false); // 控制右上角面板显示
 
   // 当切换日期时，重置活动索引和tab
   useEffect(() => {
@@ -845,19 +846,12 @@ function TravelGuide() {
       {/* Header - 降低高度 */}
       <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-6 md:py-10 px-4 relative">
         <div className="max-w-6xl mx-auto text-center">
-          {/* 右上角按钮 - 移动端和桌面端都显示 */}
-          <div className="absolute top-4 right-4 flex gap-2">
+          {/* 右上角按钮 - 显示右侧面板 */}
+          <div className="absolute top-4 right-4">
             <button
-              onClick={() => setShowRouteMap(!showRouteMap)}
+              onClick={() => setShowRightPanel(!showRightPanel)}
               className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all"
-              title="行程路线图"
-            >
-              <Navigation className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-            <button
-              onClick={() => setShowActivitySummary(!showActivitySummary)}
-              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all"
-              title="行程活动总结"
+              title="更多信息"
             >
               <Info className="w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -910,96 +904,6 @@ function TravelGuide() {
               ))}
             </div>
             
-            {/* 左侧tab导航 */}
-            <div className="space-y-2 mb-4">
-              <button
-                onClick={() => setActiveLeftTab('route-map')}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                  activeLeftTab === 'route-map'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <Navigation className="w-4 h-4" />
-                <span>行程路线图</span>
-              </button>
-
-              <button
-                onClick={() => setActiveLeftTab('essentials')}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                  activeLeftTab === 'essentials'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <Info className="w-4 h-4" />
-                <span>必备物品</span>
-              </button>
-
-              <button
-                onClick={() => setActiveLeftTab('budget')}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                  activeLeftTab === 'budget'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <DollarSign className="w-4 h-4" />
-                <span>预算参考</span>
-              </button>
-            </div>
-
-            {/* 左侧内容显示区域 */}
-            <div className="bg-white rounded-lg shadow-md p-4 max-h-96 overflow-y-auto">
-              {/* 行程路线图内容 */}
-              {activeLeftTab === 'route-map' && (
-                <div className="space-y-2">
-                  {itinerary.map((day, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex items-center gap-2 p-2 rounded transition-all cursor-pointer text-xs ${
-                        index === activeDay ? 'bg-blue-50 border border-blue-400' : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => {
-                        setActiveDay(index);
-                        setActiveTab('route');
-                      }}
-                    >
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-white text-xs ${
-                        index === activeDay ? 'bg-blue-600' : 'bg-gray-400'
-                      }`}>
-                        {day.day}
-                      </div>
-                      <span className="flex-1 truncate">{day.location}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* 必备物品内容 */}
-              {activeLeftTab === 'essentials' && tips.find(t => t.category === "必备物品") && (
-                <ul className="space-y-1.5 text-xs text-gray-600">
-                  {tips.find(t => t.category === "必备物品").items.map((item, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-600 mt-0.5">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {/* 预算参考内容 */}
-              {activeLeftTab === 'budget' && tips.find(t => t.category === "预算参考") && (
-                <ul className="space-y-1.5 text-xs text-gray-600">
-                  {tips.find(t => t.category === "预算参考").items.map((item, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-blue-600 mt-0.5">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
           </div>
         </div>
 
@@ -1490,84 +1394,112 @@ function TravelGuide() {
           </div>
         </div>
 
-          {/* 行程路线图 - 模态框显示 */}
-          {showRouteMap && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowRouteMap(false)}>
-              <div className="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <Navigation className="w-6 h-6 text-blue-600" />
-                    行程路线图
-                  </h3>
+          {/* 右上角面板 - 行程路线图、必备物品、预算参考 */}
+          {showRightPanel && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-end md:justify-center p-0 md:p-4" onClick={() => setShowRightPanel(false)}>
+              <div className="bg-white rounded-t-2xl md:rounded-xl shadow-2xl w-full md:w-96 md:max-w-md h-[80vh] md:h-auto md:max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                {/* 头部 */}
+                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-800">更多信息</h3>
                   <button
-                    onClick={() => setShowRouteMap(false)}
+                    onClick={() => setShowRightPanel(false)}
                     className="text-gray-500 hover:text-gray-700 text-2xl"
                   >
                     ×
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {itinerary.map((day, index) => (
-                    <div 
-                      key={index} 
-                      className={`flex items-center gap-4 p-3 rounded-lg transition-all cursor-pointer ${
-                        index === activeDay ? 'bg-blue-50 border-2 border-blue-400' : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => {
-                        setActiveDay(index);
-                        setShowRouteMap(false);
-                      }}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
-                        index === activeDay ? 'bg-blue-600 scale-110' : 'bg-gray-400'
-                      }`}>
-                        {day.day}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{day.location}</p>
-                        <p className="text-sm text-gray-500">{day.title}</p>
-                      </div>
-                      {index < itinerary.length - 1 && (
-                        <div className="text-gray-400">
-                          <Navigation className="w-5 h-5" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* 行程活动总结 - 模态框显示 */}
-          {showActivitySummary && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowActivitySummary(false)}>
-              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl md:text-2xl font-bold text-center flex-1">行程活动总结</h3>
+                {/* Tab导航 */}
+                <div className="flex border-b border-gray-200">
                   <button
-                    onClick={() => setShowActivitySummary(false)}
-                    className="text-white/80 hover:text-white text-2xl"
+                    onClick={() => setActiveLeftTab('route-map')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
+                      activeLeftTab === 'route-map'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-800'
+                    }`}
                   >
-                    ×
+                    <Navigation className="w-4 h-4" />
+                    <span>行程路线图</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveLeftTab('essentials')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
+                      activeLeftTab === 'essentials'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <Info className="w-4 h-4" />
+                    <span>必备物品</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveLeftTab('budget')}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
+                      activeLeftTab === 'budget'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    <span>预算参考</span>
                   </button>
                 </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-                    <Fish className="w-8 h-8 mx-auto mb-2" />
-                    <p className="font-semibold text-lg mb-1">钓鱼行程</p>
-                    <p className="text-sm">2个专业钓鱼体验</p>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-                    <Footprints className="w-8 h-8 mx-auto mb-2" />
-                    <p className="font-semibold text-lg mb-1">徒步行程</p>
-                    <p className="text-sm">2个精彩徒步路线</p>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-                    <Waves className="w-8 h-8 mx-auto mb-2" />
-                    <p className="font-semibold text-lg mb-1">海洋观光</p>
-                    <p className="text-sm">1个海洋观光体验</p>
-                  </div>
+
+                {/* 内容区域 */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  {/* 行程路线图内容 */}
+                  {activeLeftTab === 'route-map' && (
+                    <div className="space-y-2">
+                      {itinerary.map((day, index) => (
+                        <div 
+                          key={index} 
+                          className={`flex items-center gap-3 p-3 rounded-lg transition-all cursor-pointer ${
+                            index === activeDay ? 'bg-blue-50 border-2 border-blue-400' : 'hover:bg-gray-50 border border-gray-200'
+                          }`}
+                          onClick={() => {
+                            setActiveDay(index);
+                            setActiveTab('route');
+                            setShowRightPanel(false);
+                          }}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${
+                            index === activeDay ? 'bg-blue-600' : 'bg-gray-400'
+                          }`}>
+                            {day.day}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-800 text-sm">{day.location}</p>
+                            <p className="text-xs text-gray-500">{day.title}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 必备物品内容 */}
+                  {activeLeftTab === 'essentials' && tips.find(t => t.category === "必备物品") && (
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      {tips.find(t => t.category === "必备物品").items.map((item, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-blue-600 mt-1">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {/* 预算参考内容 */}
+                  {activeLeftTab === 'budget' && tips.find(t => t.category === "预算参考") && (
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      {tips.find(t => t.category === "预算参考").items.map((item, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-blue-600 mt-1">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             </div>
