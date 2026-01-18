@@ -1006,83 +1006,90 @@ function TravelGuide() {
         {/* 主内容区域 */}
         <div className="flex-1 min-w-0">
 
-          {/* 顶部活动标签 - 置顶tab，右侧显示住宿推荐和钓鱼准备/最佳钓鱼时间 */}
+          {/* 顶部活动标签 - 置顶tab */}
           <div className="mb-4 bg-white rounded-lg shadow-md p-2 sticky top-0 z-10">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* 左侧：活动标签 */}
-              <div className="flex-1">
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {itinerary[activeDay].activities.map((activity, index) => {
-                    const Icon = activity.icon;
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => setActiveActivity(index)}
-                        className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                          activeActivity === index
-                            ? 'bg-blue-600 text-white shadow-lg'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="hidden sm:inline">{activity.time}</span>
-                        <span className="sm:hidden">{activity.time.substring(0, 2)}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {/* 今日行程路线 tab - 放在最前面 */}
+              <button
+                onClick={() => setActiveTab('route')}
+                className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                  activeTab === 'route'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Navigation className="w-4 h-4" />
+                <span className="whitespace-nowrap">今日行程路线</span>
+              </button>
 
-              {/* 右侧：住宿推荐和钓鱼准备/最佳钓鱼时间 */}
-              <div className="flex-shrink-0 w-full md:w-80 lg:w-96 space-y-3">
-                {/* 住宿推荐 */}
-                {itinerary[activeDay].accommodationDetails && (
-                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Hotel className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                      <h4 className="text-sm font-bold text-gray-800">住宿推荐</h4>
-                    </div>
-                    <p className="text-xs text-gray-600 mb-1 line-clamp-1">{itinerary[activeDay].accommodationDetails.area}</p>
-                    <p className="text-xs text-gray-500">{itinerary[activeDay].accommodationDetails.priceRange}</p>
-                  </div>
-                )}
+              {/* 活动标签 */}
+              {itinerary[activeDay].activities.map((activity, index) => {
+                const Icon = activity.icon;
+                const tabKey = `activity-${index}`;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setActiveTab(tabKey);
+                      setActiveActivity(index);
+                    }}
+                    className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                      activeTab === tabKey
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline whitespace-nowrap">{activity.time}</span>
+                    <span className="sm:hidden whitespace-nowrap">{activity.time.substring(0, 2)}</span>
+                  </button>
+                );
+              })}
 
-                {/* 钓鱼准备 */}
-                {tips.find(t => t.category === "钓鱼准备") && (
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
-                      <Fish className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      钓鱼准备
-                    </h4>
-                    <ul className="space-y-1 text-xs text-gray-600">
-                      {tips.find(t => t.category === "钓鱼准备").items.slice(0, 2).map((item, index) => (
-                        <li key={index} className="flex items-start gap-1">
-                          <span className="text-blue-600 mt-0.5 flex-shrink-0">•</span>
-                          <span className="line-clamp-2">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              {/* 住宿推荐 tab */}
+              {itinerary[activeDay].accommodationDetails && (
+                <button
+                  onClick={() => setActiveTab('accommodation')}
+                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                    activeTab === 'accommodation'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <Hotel className="w-4 h-4" />
+                  <span className="whitespace-nowrap">住宿推荐</span>
+                </button>
+              )}
 
-                {/* 最佳钓鱼时间 */}
-                {tips.find(t => t.category === "最佳钓鱼时间") && (
-                  <div className="bg-cyan-50 rounded-lg p-3 border border-cyan-200">
-                    <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-                      最佳钓鱼时间
-                    </h4>
-                    <ul className="space-y-1 text-xs text-gray-600">
-                      {tips.find(t => t.category === "最佳钓鱼时间").items.slice(0, 2).map((item, index) => (
-                        <li key={index} className="flex items-start gap-1">
-                          <span className="text-cyan-600 mt-0.5 flex-shrink-0">•</span>
-                          <span className="line-clamp-2">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+              {/* 钓鱼准备 tab */}
+              {tips.find(t => t.category === "钓鱼准备") && (
+                <button
+                  onClick={() => setActiveTab('fishing-prep')}
+                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                    activeTab === 'fishing-prep'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <Fish className="w-4 h-4" />
+                  <span className="whitespace-nowrap">钓鱼准备</span>
+                </button>
+              )}
+
+              {/* 最佳钓鱼时间 tab */}
+              {tips.find(t => t.category === "最佳钓鱼时间") && (
+                <button
+                  onClick={() => setActiveTab('fishing-time')}
+                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                    activeTab === 'fishing-time'
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <Clock className="w-4 h-4" />
+                  <span className="whitespace-nowrap">最佳钓鱼时间</span>
+                </button>
+              )}
             </div>
           </div>
 
