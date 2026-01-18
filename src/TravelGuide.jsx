@@ -153,6 +153,14 @@ function DailyMap({ activities, day }) {
 
 function TravelGuide() {
   const [activeDay, setActiveDay] = useState(0);
+  const [activeActivity, setActiveActivity] = useState(0);
+  const [showRouteMap, setShowRouteMap] = useState(false);
+  const [showActivitySummary, setShowActivitySummary] = useState(false);
+
+  // 当切换日期时，重置活动索引
+  useEffect(() => {
+    setActiveActivity(0);
+  }, [activeDay]);
 
   // 城市坐标信息
   const cityCoordinates = {
@@ -831,79 +839,129 @@ function TravelGuide() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-16 px-4">
+      {/* Header - 降低高度 */}
+      <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white py-6 md:py-10 px-4 relative">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <Fish className="w-16 h-16" />
-            <Waves className="w-16 h-16" />
+          {/* 右上角按钮 - 移动端和桌面端都显示 */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={() => setShowRouteMap(!showRouteMap)}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all"
+              title="行程路线图"
+            >
+              <Navigation className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+            <button
+              onClick={() => setShowActivitySummary(!showActivitySummary)}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 md:p-3 transition-all"
+              title="行程活动总结"
+            >
+              <Info className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+          
+          <div className="flex justify-center items-center gap-3 md:gap-4 mb-3 md:mb-4">
+            <Fish className="w-10 h-10 md:w-16 md:h-16" />
+            <Waves className="w-10 h-10 md:w-16 md:h-16" />
+          </div>
+          <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold mb-2 md:mb-4">
             澳新钓鱼海洋度假之旅
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 mb-2">
+          <p className="text-sm md:text-xl lg:text-2xl text-blue-100 mb-2">
             10天深度体验澳大利亚和新西兰的海洋魅力
           </p>
-          <div className="flex justify-center items-center gap-6 mt-6 text-lg">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-6 mt-3 md:mt-6 text-sm md:text-lg">
             <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
+              <Calendar className="w-4 h-4 md:w-5 md:h-5" />
               <span>10天9夜</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
-              <span>悉尼 → 黄金海岸 → 奥克兰 → 皇后镇</span>
+              <MapPin className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="text-xs md:text-base">悉尼 → 黄金海岸 → 奥克兰 → 皇后镇</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Day Navigation */}
-        <div className="mb-8">
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
-            {itinerary.map((day, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveDay(index)}
-                className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold transition-all ${
-                  activeDay === index
-                    ? 'bg-blue-600 text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 hover:bg-blue-100'
-                }`}
-              >
-                Day {day.day}
-              </button>
-            ))}
+      <div className="max-w-6xl mx-auto px-2 md:px-4 py-4 md:py-8 flex gap-2 md:gap-4">
+        {/* 左侧日期导航 - 移动端显示，桌面端也显示 */}
+        <div className="flex-shrink-0">
+          <div className="sticky top-4">
+            <div className="flex flex-col gap-1 md:gap-2">
+              {itinerary.map((day, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setActiveDay(index);
+                    setActiveActivity(0);
+                  }}
+                  className={`flex-shrink-0 px-2 md:px-3 py-2 md:py-3 rounded-lg font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${
+                    activeDay === index
+                      ? 'bg-blue-600 text-white shadow-lg scale-105'
+                      : 'bg-white text-gray-700 hover:bg-blue-100'
+                  }`}
+                >
+                  Day {day.day}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Active Day Details */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-3xl font-bold">{itinerary[activeDay].title}</h2>
-              <span className="text-xl font-semibold">{itinerary[activeDay].date}</span>
-            </div>
-            <div className="flex items-center gap-2 text-blue-100">
-              <MapPin className="w-5 h-5" />
-              <span className="text-lg">{itinerary[activeDay].location}</span>
+        {/* 主内容区域 */}
+        <div className="flex-1 min-w-0">
+
+          {/* 顶部活动标签 - 置顶tab */}
+          <div className="mb-4 bg-white rounded-lg shadow-md p-2 sticky top-0 z-10">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {itinerary[activeDay].activities.map((activity, index) => {
+                const Icon = activity.icon;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setActiveActivity(index)}
+                    className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                      activeActivity === index
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{activity.time}</span>
+                    <span className="sm:hidden">{activity.time.substring(0, 2)}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="p-6">
-            {/* Day Image */}
-            {itinerary[activeDay].image && (
-              <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
-                <img 
-                  src={itinerary[activeDay].image} 
-                  alt={itinerary[activeDay].title}
-                  className="w-full h-64 md:h-80 object-cover"
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/800x400?text=' + encodeURIComponent(itinerary[activeDay].title);
-                  }}
-                />
+          {/* Active Day Details */}
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-4 md:mb-8">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4 md:p-6">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl md:text-3xl font-bold">{itinerary[activeDay].title}</h2>
+                <span className="text-sm md:text-xl font-semibold">{itinerary[activeDay].date}</span>
               </div>
-            )}
+              <div className="flex items-center gap-2 text-blue-100">
+                <MapPin className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="text-sm md:text-lg">{itinerary[activeDay].location}</span>
+              </div>
+            </div>
+
+            <div className="p-4 md:p-6">
+              {/* Day Image - 降低高度 */}
+              {itinerary[activeDay].image && (
+                <div className="mb-4 md:mb-6 rounded-xl overflow-hidden shadow-lg">
+                  <img 
+                    src={itinerary[activeDay].image} 
+                    alt={itinerary[activeDay].title}
+                    className="w-full h-32 md:h-48 object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/800x400?text=' + encodeURIComponent(itinerary[activeDay].title);
+                    }}
+                  />
+                </div>
+              )}
 
             {/* Flight Price */}
             <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
@@ -926,13 +984,15 @@ function TravelGuide() {
               <p className="text-cyan-700">{itinerary[activeDay].highlight}</p>
             </div>
 
+            {/* 显示当前选中的活动 */}
             <div className="space-y-6 mb-6">
               {itinerary[activeDay].activities.map((activity, index) => {
+                if (index !== activeActivity) return null;
                 const Icon = activity.icon;
                 return (
                   <div
                     key={index}
-                    className="border-l-4 border-blue-500 pl-6 py-4 bg-gradient-to-r from-blue-50 to-transparent rounded-r-lg"
+                    className="border-l-4 border-blue-500 pl-4 md:pl-6 py-4 bg-gradient-to-r from-blue-50 to-transparent rounded-r-lg"
                   >
                     <div className="flex items-start gap-4">
                       <div className="bg-blue-600 text-white rounded-full p-3">
@@ -1249,66 +1309,94 @@ function TravelGuide() {
           </div>
         </div>
 
-        {/* Route Overview */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Navigation className="w-6 h-6 text-blue-600" />
-            行程路线图
-          </h3>
-          <div className="space-y-3">
-            {itinerary.map((day, index) => (
-              <div 
-                key={index} 
-                className={`flex items-center gap-4 p-3 rounded-lg transition-all cursor-pointer ${
-                  index === activeDay ? 'bg-blue-50 border-2 border-blue-400' : 'hover:bg-gray-50'
-                }`}
-                onClick={() => setActiveDay(index)}
-              >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
-                    index === activeDay ? 'bg-blue-600 scale-110' : 'bg-gray-400'
-                  }`}>
-                    {day.day}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-800">{day.location}</p>
-                    <p className="text-sm text-gray-500">{day.title}</p>
-                  </div>
-                  {index < itinerary.length - 1 && (
-                    <div className="text-gray-400">
-                      <Navigation className="w-5 h-5" />
-                    </div>
-                  )}
+          {/* 行程路线图 - 模态框显示 */}
+          {showRouteMap && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowRouteMap(false)}>
+              <div className="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <Navigation className="w-6 h-6 text-blue-600" />
+                    行程路线图
+                  </h3>
+                  <button
+                    onClick={() => setShowRouteMap(false)}
+                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                  >
+                    ×
+                  </button>
                 </div>
-            ))}
-          </div>
-        </div>
+                <div className="space-y-3">
+                  {itinerary.map((day, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex items-center gap-4 p-3 rounded-lg transition-all cursor-pointer ${
+                        index === activeDay ? 'bg-blue-50 border-2 border-blue-400' : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => {
+                        setActiveDay(index);
+                        setShowRouteMap(false);
+                      }}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
+                        index === activeDay ? 'bg-blue-600 scale-110' : 'bg-gray-400'
+                      }`}>
+                        {day.day}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-800">{day.location}</p>
+                        <p className="text-sm text-gray-500">{day.title}</p>
+                      </div>
+                      {index < itinerary.length - 1 && (
+                        <div className="text-gray-400">
+                          <Navigation className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Activity Summary */}
-        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl shadow-lg p-6 mb-8">
-          <h3 className="text-2xl font-bold mb-4 text-center">行程活动总结</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-              <Fish className="w-8 h-8 mx-auto mb-2" />
-              <p className="font-semibold text-lg mb-1">钓鱼行程</p>
-              <p className="text-sm">2个专业钓鱼体验</p>
+          {/* 行程活动总结 - 模态框显示 */}
+          {showActivitySummary && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowActivitySummary(false)}>
+              <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl shadow-2xl p-4 md:p-6 max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl md:text-2xl font-bold text-center flex-1">行程活动总结</h3>
+                  <button
+                    onClick={() => setShowActivitySummary(false)}
+                    className="text-white/80 hover:text-white text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
+                    <Fish className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-lg mb-1">钓鱼行程</p>
+                    <p className="text-sm">2个专业钓鱼体验</p>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
+                    <Footprints className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-lg mb-1">徒步行程</p>
+                    <p className="text-sm">2个精彩徒步路线</p>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
+                    <Waves className="w-8 h-8 mx-auto mb-2" />
+                    <p className="font-semibold text-lg mb-1">海洋观光</p>
+                    <p className="text-sm">1个海洋观光体验</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-              <Footprints className="w-8 h-8 mx-auto mb-2" />
-              <p className="font-semibold text-lg mb-1">徒步行程</p>
-              <p className="text-sm">2个精彩徒步路线</p>
-            </div>
-            <div className="bg-white/20 backdrop-blur rounded-lg p-4 text-center">
-              <Waves className="w-8 h-8 mx-auto mb-2" />
-              <p className="font-semibold text-lg mb-1">海洋观光</p>
-              <p className="text-sm">1个海洋观光体验</p>
-            </div>
-          </div>
-        </div>
+          )}
 
-        {/* Footer */}
-        <div className="text-center text-gray-600 py-8">
-          <p className="mb-2">🎣 祝您享受一次完美的澳新钓鱼海洋度假之旅！</p>
-          <p className="text-sm">记得带上相机，记录每一个美好瞬间 📸</p>
+          {/* Footer */}
+          <div className="text-center text-gray-600 py-4 md:py-8">
+            <p className="mb-2">🎣 祝您享受一次完美的澳新钓鱼海洋度假之旅！</p>
+            <p className="text-sm">记得带上相机，记录每一个美好瞬间 📸</p>
+          </div>
         </div>
       </div>
     </div>

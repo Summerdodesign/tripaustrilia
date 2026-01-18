@@ -3,6 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/tripaustrilia/'
+  base: '/tripaustrilia/'  // GitHub Pages 子路径
 })
 
