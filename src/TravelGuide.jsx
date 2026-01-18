@@ -156,7 +156,7 @@ function TravelGuide() {
   const [activeActivity, setActiveActivity] = useState(0);
   const [showRouteMap, setShowRouteMap] = useState(false);
   const [showActivitySummary, setShowActivitySummary] = useState(false);
-  const [activeTab, setActiveTab] = useState('route'); // 'route', 'activity-0', 'activity-1', etc., 'accommodation', 'fishing-prep', 'fishing-time'
+  const [activeTab, setActiveTab] = useState('route'); // 'route', 'activities', 'accommodation', 'fishing-info'
   const [activeLeftTab, setActiveLeftTab] = useState('route-map'); // 'route-map', 'essentials', 'budget'
   const [showRightPanel, setShowRightPanel] = useState(false); // 控制右上角面板显示
 
@@ -910,88 +910,65 @@ function TravelGuide() {
         {/* 主内容区域 */}
         <div className="flex-1 min-w-0">
 
-          {/* 顶部活动标签 - 置顶tab */}
+          {/* 二级tab - 竖着排列 */}
           <div className="mb-4 bg-white rounded-lg shadow-md p-2 sticky top-0 z-10">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {/* 今日行程路线 tab - 放在最前面 */}
+            <div className="flex flex-col gap-2">
+              {/* 今日行程路线 tab */}
               <button
                 onClick={() => setActiveTab('route')}
-                className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${
                   activeTab === 'route'
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <Navigation className="w-4 h-4" />
-                <span className="whitespace-nowrap">今日行程路线</span>
+                <span>今日行程路线</span>
               </button>
 
-              {/* 活动标签 */}
-              {itinerary[activeDay].activities.map((activity, index) => {
-                const Icon = activity.icon;
-                const tabKey = `activity-${index}`;
-                return (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setActiveTab(tabKey);
-                      setActiveActivity(index);
-                    }}
-                    className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                      activeTab === tabKey
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline whitespace-nowrap">{activity.time}</span>
-                    <span className="sm:hidden whitespace-nowrap">{activity.time.substring(0, 2)}</span>
-                  </button>
-                );
-              })}
+              {/* 详细行程 tab - 合并所有活动 */}
+              <button
+                onClick={() => {
+                  setActiveTab('activities');
+                  setActiveActivity(0);
+                }}
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${
+                  activeTab === 'activities'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>详细行程</span>
+              </button>
 
               {/* 住宿推荐 tab */}
               {itinerary[activeDay].accommodationDetails && (
                 <button
                   onClick={() => setActiveTab('accommodation')}
-                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                  className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${
                     activeTab === 'accommodation'
                       ? 'bg-blue-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   <Hotel className="w-4 h-4" />
-                  <span className="whitespace-nowrap">住宿推荐</span>
+                  <span>住宿推荐</span>
                 </button>
               )}
 
-              {/* 钓鱼准备 tab */}
-              {tips.find(t => t.category === "钓鱼准备") && (
+              {/* 钓鱼信息 tab - 合并钓鱼准备和最佳钓鱼时间 */}
+              {(tips.find(t => t.category === "钓鱼准备") || tips.find(t => t.category === "最佳钓鱼时间")) && (
                 <button
-                  onClick={() => setActiveTab('fishing-prep')}
-                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                    activeTab === 'fishing-prep'
+                  onClick={() => setActiveTab('fishing-info')}
+                  className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${
+                    activeTab === 'fishing-info'
                       ? 'bg-blue-600 text-white shadow-lg'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   <Fish className="w-4 h-4" />
-                  <span className="whitespace-nowrap">钓鱼准备</span>
-                </button>
-              )}
-
-              {/* 最佳钓鱼时间 tab */}
-              {tips.find(t => t.category === "最佳钓鱼时间") && (
-                <button
-                  onClick={() => setActiveTab('fishing-time')}
-                  className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                    activeTab === 'fishing-time'
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Clock className="w-4 h-4" />
-                  <span className="whitespace-nowrap">最佳钓鱼时间</span>
+                  <span>钓鱼信息</span>
                 </button>
               )}
             </div>
@@ -1024,27 +1001,6 @@ function TravelGuide() {
                   />
                 </div>
               )}
-
-            {/* Flight Price */}
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <div className="flex items-center gap-2 mb-2">
-                <Plane className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-blue-800">机票价格</span>
-              </div>
-              {itinerary[activeDay].flightPrice ? (
-                <p className="text-blue-700 font-medium">{itinerary[activeDay].flightPrice}</p>
-              ) : (
-                <p className="text-gray-500 italic">缺失信息</p>
-              )}
-            </div>
-
-            <div className="mb-6 p-4 bg-cyan-50 rounded-lg border-l-4 border-cyan-500">
-              <div className="flex items-center gap-2 mb-2">
-                <Sun className="w-5 h-5 text-cyan-600" />
-                <span className="font-semibold text-cyan-800">今日亮点</span>
-              </div>
-              <p className="text-cyan-700">{itinerary[activeDay].highlight}</p>
-            </div>
 
             {/* 根据选中的tab显示内容 */}
             {activeTab === 'route' && (
@@ -1097,14 +1053,121 @@ function TravelGuide() {
                     <DailyMap activities={itinerary[activeDay].activities.filter(a => a.coordinates)} day={activeDay} />
                   </div>
                 )}
+
+                {/* 日花费预算 - 在今日行程地图下面 */}
+                <div className="mb-6 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-l-4 border-green-500">
+                  <div className="flex items-center gap-2 mb-4">
+                    <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                    <h3 className="text-lg md:text-xl font-bold text-gray-800">日花费预算</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {/* 机票价格 */}
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Plane className="w-4 h-4 text-blue-600" />
+                        <span className="font-semibold text-gray-800 text-sm">机票价格</span>
+                      </div>
+                      {itinerary[activeDay].flightPrice ? (
+                        <p className="text-blue-700 font-medium text-sm">{itinerary[activeDay].flightPrice}</p>
+                      ) : (
+                        <p className="text-gray-500 italic text-sm">缺失信息</p>
+                      )}
+                    </div>
+
+                    {/* 活动费用汇总 */}
+                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Ticket className="w-4 h-4 text-purple-600" />
+                        <span className="font-semibold text-gray-800 text-sm">活动费用</span>
+                      </div>
+                      <div className="space-y-1">
+                        {itinerary[activeDay].activities.map((activity, index) => (
+                          activity.ticketPrice && (
+                            <div key={index} className="text-xs text-gray-600">
+                              <span className="font-medium">{activity.time}:</span> {activity.ticketPrice}
+                            </div>
+                          )
+                        ))}
+                        {itinerary[activeDay].activities.every(a => !a.ticketPrice || a.ticketPrice === "缺失信息") && (
+                          <p className="text-gray-500 italic text-xs">缺失信息</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 住宿费用 */}
+                    {itinerary[activeDay].accommodationDetails && (
+                      <div className="bg-white rounded-lg p-3 shadow-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Hotel className="w-4 h-4 text-orange-600" />
+                          <span className="font-semibold text-gray-800 text-sm">住宿费用</span>
+                        </div>
+                        <p className="text-orange-700 font-medium text-sm">{itinerary[activeDay].accommodationDetails.priceRange}</p>
+                      </div>
+                    )}
+
+                    {/* 预估总费用 */}
+                    <div className="bg-green-100 rounded-lg p-3 border-2 border-green-400">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-gray-800 text-sm">预估日总费用：</span>
+                        <span className="font-bold text-green-700 text-sm">约 AUD 200-800/天</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">* 费用因个人选择和季节而异</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 机票价格 - 保留显示 */}
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Plane className="w-5 h-5 text-blue-600" />
+                    <span className="font-semibold text-blue-800">机票价格</span>
+                  </div>
+                  {itinerary[activeDay].flightPrice ? (
+                    <p className="text-blue-700 font-medium">{itinerary[activeDay].flightPrice}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">缺失信息</p>
+                  )}
+                </div>
+
+                {/* 今日亮点 - 保留显示 */}
+                <div className="mb-6 p-4 bg-cyan-50 rounded-lg border-l-4 border-cyan-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sun className="w-5 h-5 text-cyan-600" />
+                    <span className="font-semibold text-cyan-800">今日亮点</span>
+                  </div>
+                  <p className="text-cyan-700">{itinerary[activeDay].highlight}</p>
+                </div>
               </>
             )}
 
-            {/* 显示选中的活动 */}
-            {activeTab.startsWith('activity-') && (
+            {/* 详细行程 - 显示所有活动 */}
+            {activeTab === 'activities' && (
               <div className="space-y-6 mb-6">
+                {/* 活动时间标签 */}
+                <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+                  {itinerary[activeDay].activities.map((activity, index) => {
+                    const Icon = activity.icon;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setActiveActivity(index)}
+                        className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                          activeActivity === index
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="hidden sm:inline">{activity.time}</span>
+                        <span className="sm:hidden">{activity.time.substring(0, 2)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 显示选中的活动 */}
                 {itinerary[activeDay].activities.map((activity, index) => {
-                  if (activeTab !== `activity-${index}`) return null;
+                  if (index !== activeActivity) return null;
                   const Icon = activity.icon;
                 return (
                   <div
@@ -1210,39 +1273,44 @@ function TravelGuide() {
               </div>
             )}
 
-            {/* 钓鱼准备内容 */}
-            {activeTab === 'fishing-prep' && tips.find(t => t.category === "钓鱼准备") && (
-              <div className="bg-blue-50 rounded-lg p-4 md:p-6 mb-6 border border-blue-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Fish className="w-6 h-6 text-blue-600" />
-                  钓鱼准备
-                </h3>
-                <ul className="space-y-2">
-                  {tips.find(t => t.category === "钓鱼准备").items.map((item, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-600">
-                      <span className="text-blue-600 mt-1">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {/* 钓鱼信息内容 - 合并钓鱼准备和最佳钓鱼时间 */}
+            {activeTab === 'fishing-info' && (
+              <div className="space-y-6 mb-6">
+                {/* 钓鱼准备 */}
+                {tips.find(t => t.category === "钓鱼准备") && (
+                  <div className="bg-blue-50 rounded-lg p-4 md:p-6 border border-blue-200">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <Fish className="w-6 h-6 text-blue-600" />
+                      钓鱼准备
+                    </h3>
+                    <ul className="space-y-2">
+                      {tips.find(t => t.category === "钓鱼准备").items.map((item, index) => (
+                        <li key={index} className="flex items-start gap-2 text-gray-600">
+                          <span className="text-blue-600 mt-1">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-            {/* 最佳钓鱼时间内容 */}
-            {activeTab === 'fishing-time' && tips.find(t => t.category === "最佳钓鱼时间") && (
-              <div className="bg-cyan-50 rounded-lg p-4 md:p-6 mb-6 border border-cyan-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Clock className="w-6 h-6 text-cyan-600" />
-                  最佳钓鱼时间
-                </h3>
-                <ul className="space-y-2">
-                  {tips.find(t => t.category === "最佳钓鱼时间").items.map((item, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-600">
-                      <span className="text-cyan-600 mt-1">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* 最佳钓鱼时间 */}
+                {tips.find(t => t.category === "最佳钓鱼时间") && (
+                  <div className="bg-cyan-50 rounded-lg p-4 md:p-6 border border-cyan-200">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      <Clock className="w-6 h-6 text-cyan-600" />
+                      最佳钓鱼时间
+                    </h3>
+                    <ul className="space-y-2">
+                      {tips.find(t => t.category === "最佳钓鱼时间").items.map((item, index) => (
+                        <li key={index} className="flex items-start gap-2 text-gray-600">
+                          <span className="text-cyan-600 mt-1">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
