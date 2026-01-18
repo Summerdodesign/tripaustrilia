@@ -887,7 +887,7 @@ function TravelGuide() {
         {/* 左侧日期导航 - 移动端显示，桌面端也显示 */}
         <div className="flex-shrink-0">
           <div className="sticky top-4">
-            <div className="flex flex-col gap-1 md:gap-2">
+            <div className="flex flex-col gap-1 md:gap-2 mb-4">
               {itinerary.map((day, index) => (
                 <button
                   key={index}
@@ -905,33 +905,157 @@ function TravelGuide() {
                 </button>
               ))}
             </div>
+            
+            {/* 行程路线图、必备物品、预算参考 - 放在 Day 1-10 下面 */}
+            <div className="space-y-4 mt-4">
+              {/* 行程路线图 */}
+              <div className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-sm md:text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                  <Navigation className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+                  行程路线图
+                </h3>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {itinerary.map((day, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex items-center gap-2 p-2 rounded transition-all cursor-pointer text-xs ${
+                        index === activeDay ? 'bg-blue-50 border border-blue-400' : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => {
+                        setActiveDay(index);
+                        setActiveActivity(0);
+                      }}
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-white text-xs ${
+                        index === activeDay ? 'bg-blue-600' : 'bg-gray-400'
+                      }`}>
+                        {day.day}
+                      </div>
+                      <span className="flex-1 truncate">{day.location}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 必备物品 */}
+              {tips.find(t => t.category === "必备物品") && (
+                <div className="bg-white rounded-lg shadow-md p-4">
+                  <h3 className="text-sm md:text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <Info className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+                    必备物品
+                  </h3>
+                  <ul className="space-y-1.5 text-xs text-gray-600">
+                    {tips.find(t => t.category === "必备物品").items.map((item, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* 预算参考 */}
+              {tips.find(t => t.category === "预算参考") && (
+                <div className="bg-white rounded-lg shadow-md p-4">
+                  <h3 className="text-sm md:text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+                    预算参考
+                  </h3>
+                  <ul className="space-y-1.5 text-xs text-gray-600">
+                    {tips.find(t => t.category === "预算参考").items.map((item, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* 主内容区域 */}
         <div className="flex-1 min-w-0">
 
-          {/* 顶部活动标签 - 置顶tab */}
+          {/* 顶部活动标签 - 置顶tab，右侧显示住宿推荐和钓鱼准备/最佳钓鱼时间 */}
           <div className="mb-4 bg-white rounded-lg shadow-md p-2 sticky top-0 z-10">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {itinerary[activeDay].activities.map((activity, index) => {
-                const Icon = activity.icon;
-                return (
-                  <button
-                    key={index}
-                    onClick={() => setActiveActivity(index)}
-                    className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
-                      activeActivity === index
-                        ? 'bg-blue-600 text-white shadow-lg'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{activity.time}</span>
-                    <span className="sm:hidden">{activity.time.substring(0, 2)}</span>
-                  </button>
-                );
-              })}
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* 左侧：活动标签 */}
+              <div className="flex-1">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {itinerary[activeDay].activities.map((activity, index) => {
+                    const Icon = activity.icon;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setActiveActivity(index)}
+                        className={`flex-shrink-0 flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold text-xs md:text-sm transition-all ${
+                          activeActivity === index
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="hidden sm:inline">{activity.time}</span>
+                        <span className="sm:hidden">{activity.time.substring(0, 2)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 右侧：住宿推荐和钓鱼准备/最佳钓鱼时间 */}
+              <div className="flex-shrink-0 w-full md:w-80 lg:w-96 space-y-3">
+                {/* 住宿推荐 */}
+                {itinerary[activeDay].accommodationDetails && (
+                  <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Hotel className="w-4 h-4 text-gray-600 flex-shrink-0" />
+                      <h4 className="text-sm font-bold text-gray-800">住宿推荐</h4>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-1 line-clamp-1">{itinerary[activeDay].accommodationDetails.area}</p>
+                    <p className="text-xs text-gray-500">{itinerary[activeDay].accommodationDetails.priceRange}</p>
+                  </div>
+                )}
+
+                {/* 钓鱼准备 */}
+                {tips.find(t => t.category === "钓鱼准备") && (
+                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                    <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                      <Fish className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      钓鱼准备
+                    </h4>
+                    <ul className="space-y-1 text-xs text-gray-600">
+                      {tips.find(t => t.category === "钓鱼准备").items.slice(0, 2).map((item, index) => (
+                        <li key={index} className="flex items-start gap-1">
+                          <span className="text-blue-600 mt-0.5 flex-shrink-0">•</span>
+                          <span className="line-clamp-2">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 最佳钓鱼时间 */}
+                {tips.find(t => t.category === "最佳钓鱼时间") && (
+                  <div className="bg-cyan-50 rounded-lg p-3 border border-cyan-200">
+                    <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-cyan-600 flex-shrink-0" />
+                      最佳钓鱼时间
+                    </h4>
+                    <ul className="space-y-1 text-xs text-gray-600">
+                      {tips.find(t => t.category === "最佳钓鱼时间").items.slice(0, 2).map((item, index) => (
+                        <li key={index} className="flex items-start gap-1">
+                          <span className="text-cyan-600 mt-0.5 flex-shrink-0">•</span>
+                          <span className="line-clamp-2">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -983,6 +1107,55 @@ function TravelGuide() {
               </div>
               <p className="text-cyan-700">{itinerary[activeDay].highlight}</p>
             </div>
+
+            {/* 今日行程路线 - 放在活动前面 */}
+            {itinerary[activeDay].route && itinerary[activeDay].route.length > 0 && (
+              <div className="mb-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-4 md:p-6 border-l-4 border-purple-500">
+                <div className="flex items-center gap-2 mb-4">
+                  <Navigation className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+                  <h3 className="text-lg md:text-xl font-bold text-gray-800">今日行程路线</h3>
+                </div>
+                <div className="space-y-3">
+                  {itinerary[activeDay].route.map((segment, index) => (
+                    <div key={index} className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-purple-600 text-white rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center font-bold text-xs md:text-sm flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm md:text-base text-gray-800">{segment.from}</span>
+                            <Navigation className="w-3 h-3 md:w-4 md:h-4 text-purple-500" />
+                            <span className="font-semibold text-sm md:text-base text-gray-800">{segment.to}</span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs md:text-sm text-gray-600 mt-2">
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">交通：</span>
+                              <span>{segment.method}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3 md:w-4 md:h-4" />
+                              <span>{segment.time}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3 md:w-4 md:h-4" />
+                              <span>{segment.distance}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 每日地图 - 放在活动前面 */}
+            {itinerary[activeDay].activities && itinerary[activeDay].activities.some(a => a.coordinates) && (
+              <div className="mb-6">
+                <DailyMap activities={itinerary[activeDay].activities.filter(a => a.coordinates)} day={activeDay} />
+              </div>
+            )}
 
             {/* 显示当前选中的活动 */}
             <div className="space-y-6 mb-6">
@@ -1055,118 +1228,12 @@ function TravelGuide() {
               })}
             </div>
 
-            {/* Daily Route Map */}
-            {itinerary[activeDay].activities && itinerary[activeDay].activities.some(a => a.coordinates) && (
-              <DailyMap activities={itinerary[activeDay].activities.filter(a => a.coordinates)} day={activeDay} />
-            )}
 
-            {/* Route Information */}
-            {itinerary[activeDay].route && itinerary[activeDay].route.length > 0 && (
-              <div className="mb-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6 border-l-4 border-purple-500">
-                <div className="flex items-center gap-2 mb-4">
-                  <Navigation className="w-6 h-6 text-purple-600" />
-                  <h3 className="text-xl font-bold text-gray-800">今日行程路线</h3>
-                </div>
-                <div className="space-y-3">
-                  {itinerary[activeDay].route.map((segment, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                          {index + 1}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-gray-800">{segment.from}</span>
-                            <Navigation className="w-4 h-4 text-purple-500" />
-                            <span className="font-semibold text-gray-800">{segment.to}</span>
-                          </div>
-                          <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 mt-2">
-                            <div className="flex items-center gap-1">
-                              <span className="font-medium">交通：</span>
-                              <span>{segment.method}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
-                              <span>{segment.time}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              <span>{segment.distance}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Accommodation Details */}
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Hotel className="w-6 h-6 text-gray-600" />
-                <h3 className="text-xl font-bold text-gray-800">住宿推荐</h3>
-              </div>
-              {itinerary[activeDay].accommodationDetails ? (
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 mb-2">推荐区域：</p>
-                    <p className="text-gray-800 font-medium">{itinerary[activeDay].accommodationDetails.area}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 mb-2">推荐酒店：</p>
-                    <ul className="space-y-2">
-                      {itinerary[activeDay].accommodationDetails.recommendations.map((hotel, index) => (
-                        <li key={index} className="flex items-start gap-2 text-gray-700">
-                          <span className="text-blue-600 font-bold mt-1">{index + 1}.</span>
-                          <span>{hotel}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="flex items-center gap-4 pt-2 border-t border-gray-300">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700 mb-1">价格范围：</p>
-                      <p className="text-gray-800 font-medium">{itinerary[activeDay].accommodationDetails.priceRange}</p>
-                    </div>
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-3 border-l-2 border-blue-400">
-                    <p className="text-sm font-semibold text-blue-700 mb-1">💡 预订提示：</p>
-                    <p className="text-sm text-blue-800">{itinerary[activeDay].accommodationDetails.bookingTips}</p>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-gray-600 mb-2">{itinerary[activeDay].accommodation}</p>
-                  <p className="text-sm text-gray-500 italic">详细住宿信息缺失</p>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Travel Tips */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {tips.map((tip, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5 text-blue-600" />
-                {tip.category}
-              </h3>
-              <ul className="space-y-2">
-                {tip.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-start gap-2 text-gray-600">
-                    <span className="text-blue-600 mt-1">•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
 
-        {/* Interactive Map */}
+        {/* Interactive Map - 保留在地图部分 */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
             <Navigation className="w-6 h-6 text-blue-600" />
