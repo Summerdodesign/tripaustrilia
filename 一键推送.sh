@@ -1,29 +1,25 @@
 #!/bin/bash
 
-echo "🚀 TripAustralia - 一键创建并推送"
-echo ""
+# 一键推送脚本 - 自动处理所有情况
 
-# 检查仓库是否存在
-echo "检查GitHub仓库..."
-if git ls-remote --exit-code origin main &>/dev/null; then
-    echo "✅ 仓库已存在，开始推送..."
-    git push -u origin main
-    echo "✅ 推送完成！"
-    echo "📍 https://github.com/Summerdodesign/tripaustrilia"
-    exit 0
+cd /Users/summer_xia/tripaustrilia
+
+echo "🔄 步骤 1: 拉取远程最新代码..."
+git pull origin main --no-rebase --no-edit || {
+    echo "⚠️  拉取失败，尝试继续推送..."
+}
+
+echo ""
+echo "📤 步骤 2: 推送到 GitHub..."
+git push origin main
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ 推送成功！"
+    echo "📍 仓库: https://github.com/Summerdodesign/tripaustrilia"
+    echo "🌐 网站: https://summerdodesign.github.io/tripaustrilia/"
+else
+    echo ""
+    echo "❌ 推送失败，可能是网络问题"
+    echo "💡 建议：稍后重试，或使用 GitHub Desktop"
 fi
-
-echo "⚠️  仓库尚未创建"
-echo ""
-echo "请先创建GitHub仓库："
-echo "1. 访问: https://github.com/new"
-echo "2. 仓库名: tripaustrilia"
-echo "3. 选择: Public"
-echo "4. 点击: Create repository"
-echo ""
-echo "创建完成后，再次运行此脚本："
-echo "./一键推送.sh"
-echo ""
-echo "或者直接运行："
-echo "git push -u origin main"
-
